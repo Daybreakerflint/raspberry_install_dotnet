@@ -26,7 +26,7 @@ if [[ ( $user != "root" ) ]]; then
     install_dir="/home/$user/dotnet"
 fi
 
-if [ -n ${DOTNET_ROOT} ]; then
+if [ -n "$DOTNET_ROOT" ]; then
     # DOTNET_ROOT is set
     echo Previous installation detected
     if [[ ( $user != "root" ) && ( $DOTNET_ROOT != $install_dir ) ]]; then
@@ -38,18 +38,20 @@ if [ -n ${DOTNET_ROOT} ]; then
     fi
 fi
 
-echo Installing .NET at $install_dir
-echo Installing .NET 5.0 sdk: 5.0.101 aspnetcore-runtime: 5.0.1
+# Environment variables for installation using ARM32 installations
+# Date: 2021-06-02
+sdk_version="5.0.300"
+sdk_filename="dotnet-sdk-5.0.300-linux-arm.tar.gz"
+sdk_direct_link="https://download.visualstudio.microsoft.com/download/pr/4bbb3a8d-e32a-4822-81d8-b2c570414f0a/aa7659eac0f0c52316a0fa7aa7c2081a/dotnet-sdk-5.0.300-linux-arm.tar.gz"
+sdk_checksum="9e507eac7d6598188766d6281ee8102c8f2b738611a4050cc7cbce7723591dce4b6e8d35588561741852f46a6f9af4fd4b715c328007a461cc5fb468d7ab0d8c"
 
-# Environment variables for installation
-# Version: 5.0.1 
-# Date: 2020-12-08
-sdk_filename="dotnet-sdk-5.0.101-linux-arm.tar.gz"
-sdk_direct_link="https://download.visualstudio.microsoft.com/download/pr/567a64a8-810b-4c3f-85e3-bc9f9e06311b/02664afe4f3992a4d558ed066d906745/dotnet-sdk-5.0.101-linux-arm.tar.gz"
-sdk_checksum="2b03ae553b59ad39aa22b5abb5b208318b15284889a86abdc3096e382853c28b0438e2922037f9bc974c85991320175ba48d7a6963bb112651d7027692bb5cde"
-asp_filename="aspnetcore-runtime-5.0.1-linux-arm.tar.gz"
-asp_direct_link="https://download.visualstudio.microsoft.com/download/pr/11977d43-d937-4fdb-a1fb-a20d56f1877d/73aa09b745586ac657110fd8b11c0275/aspnetcore-runtime-5.0.1-linux-arm.tar.gz"
-asp_checksum="a7aa5431d79b69279a1ee9b39503030247001b747ccdd23411ff77b4f88458a49c198de35d1c1fa452684148ad9e1a176c27da97c8ff03df9ee5c3c10909c8b5"
+asp_version="5.0.6"
+asp_filename="aspnetcore-runtime-5.0.6-linux-arm.tar.gz"
+asp_direct_link="https://download.visualstudio.microsoft.com/download/pr/9d2abf34-b484-46ab-8e3b-504b0057827b/7266d743d6441c1f80510a50c17491dc/aspnetcore-runtime-5.0.6-linux-arm.tar.gz"
+asp_checksum="d00b6198ace6aa2b9b164297be42cd442099fd128d3409e17d20d3d1a67d2ab9e2350d3ceea7260101b60247402d828be09b714cd431e7211fd9dee49fba35c7"
+
+echo Installing .NET at $install_dir
+echo Installing .NET 5.0 sdk: $sdk_version aspnetcore-runtime: $asp_version
 
 wget $sdk_direct_link
 wget $asp_direct_link
@@ -63,8 +65,16 @@ echo Files are correct!
 
 echo -----------------------
 echo Unzipping files to $install_dir
-mkdir $install_dir
+if [ -d "$install_dir" ]; then
+    echo Folder $install_dir exists
+else
+    echo Creating folder $install_dir
+    mkdir $install_dir
+fi
+
+echo Unzipping $sdk_filename
 tar zxf $sdk_filename -C $install_dir
+echo Unzipping $asp_filename
 tar zxf $asp_filename -C $install_dir
 rm -rf $sdk_filename
 rm -rf $asp_filename

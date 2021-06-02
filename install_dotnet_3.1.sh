@@ -38,18 +38,20 @@ if [ -n "$DOTNET_ROOT" ]; then
     fi
 fi
 
-echo Installing .NET at $install_dir
-echo Installing .NET 3.1 sdk: 3.1.404 aspnetcore-runtime: 3.1.10
+# Environment variables for installation using ARM32 installations
+# Date: 2021-06-02
+sdk_version="3.1.409"
+sdk_filename="dotnet-sdk-3.1.409-linux-arm.tar.gz"
+sdk_direct_link="https://download.visualstudio.microsoft.com/download/pr/58d0ebb7-c06d-4d9a-a69f-22dac06fb278/0ae7881b7007c13a8e325d54a8f87657/dotnet-sdk-3.1.409-linux-arm.tar.gz"
+sdk_checksum="4908a84951a93acac80c6e7d2dff88b40b90fa079bfc0a02678a70c412a45f1146a3d344c218791edef4bb972d549accadcbfcdc721be0478b07db3a3336cf6d"
 
-# Environment variables for installation
-# Version: 3.1.10 
-# Date: 2020-11-10
-sdk_filename="dotnet-sdk-3.1.404-linux-arm.tar.gz"
-sdk_direct_link="https://download.visualstudio.microsoft.com/download/pr/2ebe1f4b-4423-4694-8f5b-57f22a315d66/4bceeffda88fc6f19fad7dfb2cd30487/dotnet-sdk-3.1.404-linux-arm.tar.gz"
-sdk_checksum="0aaed20c96c97fd51b8e0f525caf75ab95c5a51de561e76dc89dad5d3c18755c0c773b51be6f1f5b07dda02d2bb426c5b9c45bb5dd59914beb90199f41e5c59e"
-asp_filename="aspnetcore-runtime-3.1.10-linux-arm.tar.gz"
-asp_direct_link="https://download.visualstudio.microsoft.com/download/pr/a2223d1f-c138-4586-8cd1-274c5387e975/623ece755546aca8f4be268f525683c5/aspnetcore-runtime-3.1.10-linux-arm.tar.gz"
-asp_checksum="02e304af66734fa14042e59b0c47a1c19ffcacef6dd58f293352dd32a79b5abce303010101384fe25d20cb6391df4bdffc8e3cf766f88781a8e3b1f6b1e2ee0d"
+asp_version="3.1.15"
+asp_filename="aspnetcore-runtime-3.1.15-linux-arm.tar.gz"
+asp_direct_link="https://download.visualstudio.microsoft.com/download/pr/000183b9-3d77-4e03-902e-7debe460497d/dcd6400fe1f28baba8624d3242f820a7/aspnetcore-runtime-3.1.15-linux-arm.tar.gz"
+asp_checksum="3c4fcbf9eab630f25605cfcbe8c55af452d4b10cc054257e26dfa4bdb09fd025c35cc9ea12dbcbc7c420946e618b9e8ba50ca81525b5055c79323bb7e94b5544"
+
+echo Installing .NET at $install_dir
+echo Installing .NET 5.0 sdk: $sdk_version aspnetcore-runtime: $asp_version
 
 wget $sdk_direct_link
 wget $asp_direct_link
@@ -63,8 +65,16 @@ echo Files are correct!
 
 echo -----------------------
 echo Unzipping files to $install_dir
-mkdir $install_dir
+if [ -d "$install_dir" ]; then
+    echo Folder $install_dir exists
+else
+    echo Creating folder $install_dir
+    mkdir $install_dir
+fi
+
+echo Unzipping $sdk_filename
 tar zxf $sdk_filename -C $install_dir
+echo Unzipping $asp_filename
 tar zxf $asp_filename -C $install_dir
 rm -rf $sdk_filename
 rm -rf $asp_filename
